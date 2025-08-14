@@ -1,0 +1,22 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm run build:electron:*)",
+      "Bash(npm run:*)",
+      "Bash(npx vite:*)",
+      "Bash(python:*)",
+      "Bash(rustc --version)",
+      "Bash(pnpm tauri:*)",
+      "Bash(cargo --version)",
+      "Bash(tasklist:*)",
+      "Bash(taskkill:*)",
+      "Bash(powershell:*)",
+      "Bash(dir:*)",
+      "Bash(cargo build:*)",
+      "Bash(cargo tauri build:*)",
+      "Bash(pnpm exec tauri:*)",
+      "Bash(\"E:\\dev\\RisuAI\\src-tauri\\target\\x86_64-pc-windows-msvc\\release\\RisuAI.exe\")"
+    ],
+    "defaultMode": "acceptEdits"
+  }
+}

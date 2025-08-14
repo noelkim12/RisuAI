@@ -57,6 +57,75 @@ export async function stableDiff(currentChar:character,prompt:string){
     return await generateAIImage(genPrompt, currentChar, neg, '')
 }
 
+export async function generateAIImageSD(params:any, currentChar:character, returnSdData:string):Promise<string|false>{
+    const db = getDatabase()
+    
+    if(db.sdProvider !== 'webui'){
+        alertError("generateAIImageSD only works with WebUI provider")
+        return false
+    }
+
+    const uri = new URL(db.webUiUrl)
+    uri.pathname = '/sdapi/v1/txt2img'
+    
+    try {
+        // Use params directly from the input, with fallback to default values
+        const requestBody = {
+            prompt: params.prompt || '',
+            negative_prompt: params.negative_prompt || '',
+            sampler_name: params.sampler_name || "DPM++ 2M SDE",
+            scheduler: params.scheduler,
+            steps: params.steps || 20,
+            width: params.width || 512,
+            height: params.height || 512,
+            cfg_scale: params.cfg_scale || 7,
+            seed: params.seed || -1,
+            enable_hr: params.enable_hr || false,
+            denoising_strength: params.denoising_strength || 0.7,
+            hr_scale: params.hr_scale || 2,
+            hr_upscaler: params.hr_upscaler || "Latent",
+            alwayson_scripts: params.alwayson_scripts || {}
+        }
+
+        const da = await globalFetch(uri.toString(), {
+            body: requestBody,
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+
+        console.log(uri)
+        console.log(da)
+        if(returnSdData === 'inlay'){
+            if(da.ok){
+                return `data:image/png;base64,${da.data.images[0]}`
+            }
+            else{
+                alertError(JSON.stringify(da.data))
+                return ''
+            }
+        }
+        else if(da.ok){
+            let charemotions = get(CharEmotion)
+            const img = `data:image/png;base64,${da.data.images[0]}`
+            const emos:[string, string,number][] = [[img, img, Date.now()]]
+            charemotions[currentChar.chaId] = emos
+            CharEmotion.set(charemotions)
+        }
+        else{
+            console.log(da)
+            alertError(JSON.stringify(da.data))
+            return false   
+        }
+
+        return returnSdData
+
+    } catch (error) {
+        alertError(error)
+        return false   
+    }
+}
+
 export async function generateAIImage(genPrompt:string, currentChar:character, neg:string, returnSdData:string):Promise<string|false>{
     const db = getDatabase()
     console.log(db.sdProvider)

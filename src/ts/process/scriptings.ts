@@ -372,6 +372,22 @@ export async function runScripted(code:string, arg:{
                 return `{{inlay::${inlay}}}`
             })
 
+            declareAPI('generateImageSD', async (id:string, params:any) => {
+                if(!ScriptingLowLevelIds.has(id)){
+                    return
+                }
+                const { generateAIImageSD } = await import('./stableDiff')
+                const gen = await generateAIImageSD(params, char as character, 'inlay')
+                console.log("gen :: ", gen);
+                if(!gen){
+                    return 'Error: Image generation failed'
+                }
+                const imgHTML = new Image()
+                imgHTML.src = gen
+                const inlay = await writeInlayImage(imgHTML)
+                return `{{inlay::${inlay}}}`
+            })
+
             declareAPI('hash', async (id:string, value:string) => {
                 return await hasher(new TextEncoder().encode(value))
             })
@@ -817,7 +833,6 @@ export async function runScripted(code:string, arg:{
                 return null
             })
 
-            console.log('Running Lua code:', code)
             if(ScriptingEngineState.type === 'lua'){
                 await ScriptingEngineState.engine?.doString(luaCodeWrapper(code))
             }

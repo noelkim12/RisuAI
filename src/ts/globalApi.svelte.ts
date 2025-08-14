@@ -880,9 +880,9 @@ export async function globalFetch(url: string, arg: GlobalFetchArgs = {}): Promi
     const urlHost = new URL(url).hostname
     const forcePlainFetch = ((knownHostes.includes(urlHost) && !isTauri) || db.usePlainFetch || arg.plainFetchForce) && !arg.plainFetchDeforce
 
-    if (knownHostes.includes(urlHost) && !isTauri && !isNodeServer) {
-      return { ok: false, headers: {}, status:400, data: 'You are trying local request on web version. This is not allowed due to browser security policy. Use the desktop version instead, or use a tunneling service like ngrok and set the CORS to allow all.' };
-    }
+    // if (knownHostes.includes(urlHost) && !isTauri && !isNodeServer) {
+    //   return { ok: false, headers: {}, status:400, data: 'You are trying local request on web version. This is not allowed due to browser security policy. Use the desktop version instead, or use a tunneling service like ngrok and set the CORS to allow all.' };
+    // }
 
     if (forcePlainFetch) {
       return await fetchWithPlainFetch(url, arg);
